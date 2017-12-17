@@ -37,18 +37,18 @@ import cn.bmob.v3.listener.UpdateListener;
 
 public class RecordManager {
  
-    private static RecordManager recordManager =new RecordManager(null);
+    private static RecordManager recordManager =new RecordManager();
 
     private static DB db;
 
     // the selected values in list activity
-    public static Double SELECTED_SUM = null;
-    public static List<CoCoinRecord> SELECTED_RECORDS= null;
+    public static Double SELECTED_SUM = new Double();
+    public static List<CoCoinRecord> SELECTED_RECORDS= new List<CoCoinRecord>();
 
-    public static Integer SUM = null;
-    public static List<CoCoinRecord> RECORDS= null;
-    public static List<Tag> TAGS= null;
-    public static Map<Integer, String> TAG_NAMES= null;
+    public static Integer SUM = new Integer();
+    public static List<CoCoinRecord> RECORDS= new List<CoCoinRecord>();
+    public static List<Tag> TAGS= new List<Tag>();
+    public static Map<Integer, String> TAG_NAMES= new Map();
 
     public static boolean RANDOM_DATA = false;
     private final int RANDOM_DATA_NUMBER_ON_EACH_DAY = 3;
