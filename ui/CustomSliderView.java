@@ -14,7 +14,7 @@ import com.nightonke.saver.R;
  * Created by Weiping on 2016/1/23.
  */
 public class CustomSliderView extends BaseSliderView {
-    private static Typeface font = null;
+    private static Typeface font = new Typeface();
     private Context context ;
     public CustomSliderView(Context context) {
         super(context);

@@ -17,7 +17,7 @@ import com.nightonke.saver.util.CoCoinUtil;
  * Created by Weiping on 2016/1/23.
  */
 public class CustomTitleSliderView extends BaseSliderView {
-    private static Typeface font = null;
+    private static Typeface font = new Typeface();
     private String content;
     private int type;
     private TextView title;

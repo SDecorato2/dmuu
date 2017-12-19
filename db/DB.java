@@ -19,18 +19,16 @@ import java.util.LinkedList;
  * Created by 伟平 on 2015/10/20.
  */
 
-public class DB {
+public class DB{
 
     public static final String DB_NAME_STRING = "CoCoin Database.db";
     public static final String RECORD_DB_NAME_STRING = "Record";
     public static final String TAG_DB_NAME_STRING = "Tag";
 
     public static final int VERSION = 1;
-
-    private static DB db;
+    private static DB db = (DB) new Object();
     private SQLiteDatabase sqliteDatabase;
     private DBHelper dbHelper;
-
     private DB(Context context) throws IOException {
         dbHelper = new DBHelper(context, DB_NAME_STRING, null, VERSION);
         sqliteDatabase = dbHelper.getWritableDatabase();
@@ -56,7 +54,7 @@ public class DB {
                 tag.setWeight(cursor.getInt(cursor.getColumnIndex("WEIGHT")));
                 RecordManager.TAGS.add(tag);
             } while (cursor.moveToNext());
-            if (cursor != null) cursor.close();
+            closeCursor(cursor);
         }
 
         cursor = sqliteDatabase
@@ -74,14 +72,29 @@ public class DB {
                 coCoinRecord.setLocalObjectId(cursor.getString(cursor.getColumnIndex("OBJECT_ID")));
                 coCoinRecord.setIsUploaded(
                         cursor.getInt(cursor.getColumnIndex("IS_UPLOADED")) == 0 ? false : true);
-
-                if (BuildConfig.DEBUG) Log.d("CoCoin Debugger", "Load " + coCoinRecord.toString() + " S");
-
+                setLog(coCoinRecord);
                 RecordManager.RECORDS.add(coCoinRecord);
                 RecordManager.SUM += (int) coCoinRecord.getMoney();
             } while (cursor.moveToNext());
-            if (cursor != null) cursor.close();
+            closeCursor(cursor);
         }
+    }
+
+
+    /**
+     *
+     * @param cursor
+     */
+    public void closeCursor(Cursor cursor){
+        if(cursor!= null) cursor.close();
+    }
+
+    /**
+     *
+     * @param coCoinRecord
+     */
+    public void setLog(CoCoinRecord coCoinRecord){
+        if (BuildConfig.DEBUG) Log.d("CoCoin Debugger", "Load " + coCoinRecord.toString() + " S");
     }
 
     // return the row ID of the newly inserted row, or -1 if an error occurred

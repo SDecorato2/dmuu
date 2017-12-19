@@ -1,5 +1,16 @@
 package com.nightonke.saver.model;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.util.Log;
+import android.widget.Toast;
+import com.github.johnpersano.supertoasts.SuperToast;
+import com.nightonke.saver.BuildConfig;
+import com.nightonke.saver.R;
+import com.nightonke.saver.activity.CoCoinApplication;
+import com.nightonke.saver.db.DB;
+import com.nightonke.saver.util.CoCoinToast;
+import com.nightonke.saver.util.CoCoinUtil;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -10,20 +21,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-
-import com.github.johnpersano.supertoasts.SuperToast;
-import com.nightonke.saver.BuildConfig;
-import com.nightonke.saver.R;
-import com.nightonke.saver.activity.CoCoinApplication;
-import com.nightonke.saver.db.DB;
-import com.nightonke.saver.util.CoCoinToast;
-import com.nightonke.saver.util.CoCoinUtil;
-import com.sun.tools.internal.xjc.reader.xmlschema.bindinfo.BIConversion.User;
-
-import android.content.SharedPreferences;
+import cn.bmob.v3.BmobObject;
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.BmobUser;
+import cn.bmob.v3.listener.DeleteListener;
 import cn.bmob.v3.listener.FindListener;
+import cn.bmob.v3.listener.SaveListener;
+import cn.bmob.v3.listener.UpdateListener;
 
 /**
  * Created by 伟平 on 2015/10/20.
@@ -31,18 +35,18 @@ import cn.bmob.v3.listener.FindListener;
 
 public class RecordManager {
  
-    private static RecordManager recordManager =new RecordManager();
+    private static RecordManager recordManager = (RecordManager) new Object();
 
-    private static DB db= new DB ();
+    private static DB db = (DB) new Object();
 
     // the selected values in list activity
-    public static Double SELECTED_SUM = new Double();
-    public static List<CoCoinRecord> SELECTED_RECORDS= new List<CoCoinRecord>();
+    public static Double SELECTED_SUM = new Double(1);
+    public static List<CoCoinRecord> SELECTED_RECORDS= new ArrayList<>();
 
-    public static Integer SUM = new Integer();
-    public static List<CoCoinRecord> RECORDS= new List<CoCoinRecord>();
-    public static List<Tag> TAGS= new List<Tag>();
-    public static Map<Integer, String> TAG_NAMES= new Map();
+    public static Integer SUM = new Integer(1);
+    public static List<CoCoinRecord> RECORDS= new ArrayList<>();
+    public static List<Tag> TAGS= new ArrayList<>();
+    public static Map<Integer, String> TAG_NAMES= new HashMap<>();
 
     public static boolean RANDOM_DATA = false;
     private final int RANDOM_DATA_NUMBER_ON_EACH_DAY = 3;
@@ -178,7 +182,7 @@ public class RecordManager {
     public static int saveTag(Tag tag) {
         int insertId = -1;
 
-        boolean duplicatedName=checkInserid();
+        boolean duplicatedName=checkInserid(tag);
 
         if (duplicatedName) {
             return SAVE_TAG_ERROR_DUPLICATED_NAME;
@@ -200,7 +204,7 @@ public class RecordManager {
         return insertId;
     }
 
-    private static boolean checkInserid(){
+    private static boolean checkInserid(Tag tag){
         if (BuildConfig.DEBUG) {
             if (BuildConfig.DEBUG) Log.d("CoCoin", "recordManager.saveTag: " + tag.toString());
         }
@@ -276,7 +280,7 @@ public class RecordManager {
     public static int deleteTag(int id) {
         int deletedId = -1;
 
-        boolean tagReference= checkDeletTag();
+        boolean tagReference= checkDeletTag(id, deletedId);
 
         if (tagReference) {
             return DELETE_TAG_ERROR_TAG_REFERENCE;
@@ -299,7 +303,7 @@ public class RecordManager {
         return deletedId;
     }
 
-    private static boolean checkDeletTag(){
+    private static boolean checkDeletTag(int id, int deletedId){
         if (BuildConfig.DEBUG) Log.d("CoCoin",
                 "Manager: Delete tag: " + "Tag(id = " + id + ", deletedId = " + deletedId + ")");
         boolean tagReference = false;
@@ -439,7 +443,8 @@ public class RecordManager {
         return counter;
     }
 
-    private updateOldCocoinRecord(){
+    private static void updateOldCocoinRecord(){
+        final CoCoinRecord coCoinRecord = (CoCoinRecord) new Object();
         coCoinRecord.save(CoCoinApplication.getAppContext(), new SaveListener() {
             @Override
             public void onSuccess() {
@@ -465,7 +470,9 @@ public class RecordManager {
         });
     }
 
-    private void updateCoCoinRecord(){
+    private static void updateCoCoinRecord(){
+        final CoCoinRecord coCoinRecord = (CoCoinRecord) new Object();
+        BmobObject user = (BmobObject) new Object();
         coCoinRecord.setUserId(user.getObjectId());
         coCoinRecord.update(CoCoinApplication.getAppContext(),
                 coCoinRecord.getLocalObjectId(), new UpdateListener() {
@@ -556,7 +563,8 @@ public class RecordManager {
         return updateNum;
     }
 
-    private getRecordsServer(){
+    private static void getRecordsServer(){
+        CoCoinRecord[] object = (CoCoinRecord[]) new Object();
         for (CoCoinRecord coCoinRecord : object) {
             boolean exist = false;
             for (int i = RECORDS.size() - 1; i >= 0; i--) {
